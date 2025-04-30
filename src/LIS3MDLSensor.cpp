@@ -283,6 +283,21 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetAxesRaw(int16_t *pData)
  * @param  odr the pointer to the output data rate
  * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
  */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetODRRaw(LIS3MDL_MAG_DO_t* odr)
+{
+  if ( LIS3MDL_MAG_R_OutputDataRate( (void *)this, &odr ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Read LIS3MDL Magnetometer output data rate
+ * @param  odr the pointer to the output data rate
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
 LIS3MDLStatusTypeDef LIS3MDLSensor::GetODR(float* odr)
 {
   LIS3MDL_MAG_DO_t odr_low_level;
@@ -331,6 +346,21 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetODR(float* odr)
  * @param  odr the output data rate to be set
  * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
  */
+LIS3MDLStatusTypeDef LIS3MDLSensor::SetODRRaw(LIS3MDL_MAG_DO_t odr)
+{
+  if ( LIS3MDL_MAG_W_OutputDataRate( (void *)this, odr ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Set ODR
+ * @param  odr the output data rate to be set
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
 LIS3MDLStatusTypeDef LIS3MDLSensor::SetODR(float odr)
 {
   LIS3MDL_MAG_DO_t new_odr;
@@ -352,6 +382,22 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::SetODR(float odr)
   return LIS3MDL_STATUS_OK;
 }
 
+/**
+ * @brief  Read LIS3MDL Magnetometer full scale
+ * @param  fullScale the pointer to the output data rate
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetFSRaw(LIS3MDL_MAG_FS_t *fullScale)
+{
+  LIS3MDL_MAG_FS_t fs_low_level;
+
+  if ( LIS3MDL_MAG_R_FullScale( (void *)this, &fullScale ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
 
 /**
  * @brief  Read LIS3MDL Magnetometer full scale
@@ -384,6 +430,21 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetFS(float* fullScale)
     default:
       *fullScale = -1.0f;
       return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Set full scale
+ * @param  fullScale the full scale to be set
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::SetFSRaw(LIS3MDL_MAG_FS_t fullScale)
+{
+  if ( LIS3MDL_MAG_W_FullScale( (void *)this, fullScale ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
   }
 
   return LIS3MDL_STATUS_OK;

@@ -84,9 +84,13 @@ class LIS3MDLSensor
     LIS3MDLStatusTypeDef GetSensitivity (float *pfData);
     LIS3MDLStatusTypeDef GetAxesRaw     (int16_t *pData);
 	LIS3MDLStatusTypeDef GetODR         (float *odr);
+	LIS3MDLStatusTypeDef GetODRRaw      (LIS3MDL_MAG_DO_t *odr);
 	LIS3MDLStatusTypeDef SetODR         (float odr);
+	LIS3MDLStatusTypeDef SetODRRaw      (LIS3MDL_MAG_DO_t odr);
 	LIS3MDLStatusTypeDef GetFS          (float *fullScale);
+  LIS3MDLStatusTypeDef GetFSRaw       (LIS3MDL_MAG_FS_t *fullScale);
 	LIS3MDLStatusTypeDef SetFS          (float fullScale);
+	LIS3MDLStatusTypeDef SetFSRaw       (LIS3MDL_MAG_FS_t fullScale);
 	LIS3MDLStatusTypeDef ReadReg        (uint8_t reg, uint8_t *data);
 	LIS3MDLStatusTypeDef WriteReg       (uint8_t reg, uint8_t data);
 	
