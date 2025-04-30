@@ -49,10 +49,12 @@
 #include "LIS3MDL_MAG_Driver.h"
 
 /* Defines -------------------------------------------------------------------*/
-#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_4G   0.14  /**< Sensitivity value for 4 gauss full scale [LSB/gauss] */
-#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_8G   0.29  /**< Sensitivity value for 8 gauss full scale [LSB/gauss] */
-#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_12G  0.43  /**< Sensitivity value for 12 gauss full scale [LSB/gauss] */
-#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_16G  0.58  /**< Sensitivity value for 16 gauss full scale [LSB/gauss] */
+#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_4G   6842  /**< Sensitivity value for 4 gauss full scale [LSB/gauss] */
+#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_8G   3421  /**< Sensitivity value for 8 gauss full scale [LSB/gauss] */
+#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_12G  2281  /**< Sensitivity value for 12 gauss full scale [LSB/gauss] */
+#define LIS3MDL_MAG_SENSITIVITY_FOR_FS_16G  1711  /**< Sensitivity value for 16 gauss full scale [LSB/gauss] */
+
+#define LIS3MDL_TEMP_SENSITIVITY               8  /**< Sensitivity value for temp sensor [LSB/degC] */
 
 /* Typedefs ------------------------------------------------------------------*/
 typedef enum
@@ -80,9 +82,12 @@ class LIS3MDLSensor
     LIS3MDLStatusTypeDef Enable         (void);
     LIS3MDLStatusTypeDef Disable        (void);
     LIS3MDLStatusTypeDef ReadID         (uint8_t *p_id);
-    LIS3MDLStatusTypeDef GetAxes        (int32_t *pData);
-    LIS3MDLStatusTypeDef GetSensitivity (float *pfData);
+    LIS3MDLStatusTypeDef GetAxes        (float *pData);
+    LIS3MDLStatusTypeDef GetSensitivity (int16_t *pfData);
     LIS3MDLStatusTypeDef GetAxesRaw     (int16_t *pData);
+    LIS3MDLStatusTypeDef GetTemp        (float *pData);
+    LIS3MDLStatusTypeDef GetTempSensitivity(int16_t *pfData);
+    LIS3MDLStatusTypeDef GetTempRaw     (int16_t *pData);
 	LIS3MDLStatusTypeDef GetODR         (float *odr);
 	LIS3MDLStatusTypeDef GetODRRaw      (LIS3MDL_MAG_DO_t *odr);
 	LIS3MDLStatusTypeDef SetODR         (float odr);
@@ -91,6 +96,13 @@ class LIS3MDLSensor
   LIS3MDLStatusTypeDef GetFSRaw       (LIS3MDL_MAG_FS_t *fullScale);
 	LIS3MDLStatusTypeDef SetFS          (float fullScale);
 	LIS3MDLStatusTypeDef SetFSRaw       (LIS3MDL_MAG_FS_t fullScale);
+  LIS3MDLStatusTypeDef GetModeXY      (LIS3MDL_MAG_OM_t *mode);
+  LIS3MDLStatusTypeDef SetModeXY      (LIS3MDL_MAG_OM_t mode);
+  LIS3MDLStatusTypeDef GetModeZ       (LIS3MDL_MAG_OMZ_t *mode);
+  LIS3MDLStatusTypeDef SetModeZ       (LIS3MDL_MAG_OMZ_t mode);
+  LIS3MDLStatusTypeDef GetFastODR     (LIS3MDL_MAG_FODR_t *mode);
+  LIS3MDLStatusTypeDef SetFastODR     (LIS3MDL_MAG_FODR_t mode);
+  LIS3MDLStatusTypeDef SelfTest       (LIS3MDL_MAG_ST_t mode);
 	LIS3MDLStatusTypeDef ReadReg        (uint8_t reg, uint8_t *data);
 	LIS3MDLStatusTypeDef WriteReg       (uint8_t reg, uint8_t data);
 	

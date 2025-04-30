@@ -267,6 +267,21 @@ mems_status_t LIS3MDL_MAG_R_OperatingModeXY(void *handle, LIS3MDL_MAG_OM_t *valu
 /*******************************************************************************
 * Register      : CTRL_REG1
 * Address       : 0X20
+* Bit Group Name: FAST_ODR
+* Permission    : RW
+*******************************************************************************/
+typedef enum {
+  	LIS3MDL_MAG_FODR_OFF 		 =0x00,
+  	LIS3MDL_MAG_FODR_ON 		 =0x02,
+} LIS3MDL_MAG_FODR_t;
+
+#define  	LIS3MDL_MAG_FODR_MASK  	0x02
+mems_status_t  LIS3MDL_MAG_W_FastODR(void *handle, LIS3MDL_MAG_FODR_t newValue);
+mems_status_t LIS3MDL_MAG_R_FastODR(void *handle, LIS3MDL_MAG_FODR_t *value);
+
+/*******************************************************************************
+* Register      : CTRL_REG1
+* Address       : 0X20
 * Bit Group Name: TEMP_EN
 * Permission    : RW
 *******************************************************************************/

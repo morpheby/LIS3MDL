@@ -377,6 +377,46 @@ mems_status_t LIS3MDL_MAG_R_OperatingModeXY(void *handle, LIS3MDL_MAG_OM_t *valu
 }
 
 /*******************************************************************************
+* Function Name  : LIS3MDL_MAG_W_FastODR
+* Description    : Write FAST_ODR
+* Input          : LIS3MDL_MAG_FODR_t
+* Output         : None
+* Return         : Status [MEMS_ERROR, MEMS_SUCCESS]
+*******************************************************************************/
+mems_status_t  LIS3MDL_MAG_W_FastODR(void *handle, LIS3MDL_MAG_FODR_t newValue)
+{
+  u8_t value;
+
+  if( !LIS3MDL_MAG_ReadReg(handle, LIS3MDL_MAG_CTRL_REG1, &value, 1) )
+    return MEMS_ERROR;
+
+  value &= ~LIS3MDL_MAG_FODR_MASK; 
+  value |= newValue;
+  
+  if( !LIS3MDL_MAG_WriteReg(handle, LIS3MDL_MAG_CTRL_REG1, &value, 1) )
+    return MEMS_ERROR;
+
+  return MEMS_SUCCESS;
+}
+
+/*******************************************************************************
+* Function Name  : LIS3MDL_MAG_R_FastODR
+* Description    : Read FAST_ODR
+* Input          : Pointer to LIS3MDL_MAG_FODR_t
+* Output         : Status of FAST_ODR see LIS3MDL_MAG_FODR_t
+* Return         : Status [MEMS_ERROR, MEMS_SUCCESS]
+*******************************************************************************/
+mems_status_t LIS3MDL_MAG_R_FastODR(void *handle, LIS3MDL_MAG_FODR_t *value)
+{
+ if( !LIS3MDL_MAG_ReadReg(handle, LIS3MDL_MAG_CTRL_REG1, (u8_t *)value, 1) )
+    return MEMS_ERROR;
+
+  *value &= LIS3MDL_MAG_FODR_MASK; //mask
+
+  return MEMS_SUCCESS;
+}
+
+/*******************************************************************************
 * Function Name  : LIS3MDL_MAG_W_TemperatureSensor
 * Description    : Write TEMP_EN
 * Input          : LIS3MDL_MAG_TEMP_EN_t

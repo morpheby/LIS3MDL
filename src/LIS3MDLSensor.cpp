@@ -105,8 +105,8 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::begin()
     return LIS3MDL_STATUS_ERROR;
   }
 
-  /* Temperature sensor disable - temp. sensor not used */
-  if ( LIS3MDL_MAG_W_TemperatureSensor( (void *)this, LIS3MDL_MAG_TEMP_EN_DISABLE ) == MEMS_ERROR )
+  /* Temperature sensor enable */
+  if ( LIS3MDL_MAG_W_TemperatureSensor( (void *)this, LIS3MDL_MAG_TEMP_EN_ENABLE ) == MEMS_ERROR )
   {
     return LIS3MDL_STATUS_ERROR;
   }
@@ -192,10 +192,10 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::ReadID(uint8_t *p_id)
  * @param  pData the pointer where the magnetometer data are stored
  * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
  */
-LIS3MDLStatusTypeDef LIS3MDLSensor::GetAxes(int32_t *pData)
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetAxes(float *pData)
 {
   int16_t pDataRaw[3];
-  float sensitivity = 0;
+  int16_t sensitivity = 0;
 
   /* Read raw data from LIS3MDL output register. */
   if ( GetAxesRaw( pDataRaw ) == LIS3MDL_STATUS_ERROR )
@@ -210,9 +210,9 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetAxes(int32_t *pData)
   }
 
   /* Calculate the data. */
-  pData[0] = ( int32_t )( pDataRaw[0] * sensitivity );
-  pData[1] = ( int32_t )( pDataRaw[1] * sensitivity );
-  pData[2] = ( int32_t )( pDataRaw[2] * sensitivity );
+  pData[0] = ( ( (float) pDataRaw[0] ) / sensitivity );
+  pData[1] = ( ( (float) pDataRaw[1] ) / sensitivity );
+  pData[2] = ( ( (float) pDataRaw[2] ) / sensitivity );
 
   return LIS3MDL_STATUS_OK;
 }
@@ -222,7 +222,7 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetAxes(int32_t *pData)
  * @param  pfData the pointer where the magnetometer sensitivity is stored
  * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
  */
-LIS3MDLStatusTypeDef LIS3MDLSensor::GetSensitivity(float *pfData)
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetSensitivity(int16_t *pfData)
 {
   LIS3MDL_MAG_FS_t fullScale;
 
@@ -236,19 +236,19 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetSensitivity(float *pfData)
   switch( fullScale )
   {
     case LIS3MDL_MAG_FS_4Ga:
-      *pfData = ( float )LIS3MDL_MAG_SENSITIVITY_FOR_FS_4G;
+      *pfData = LIS3MDL_MAG_SENSITIVITY_FOR_FS_4G;
       break;
     case LIS3MDL_MAG_FS_8Ga:
-      *pfData = ( float )LIS3MDL_MAG_SENSITIVITY_FOR_FS_8G;
+      *pfData = LIS3MDL_MAG_SENSITIVITY_FOR_FS_8G;
       break;
     case LIS3MDL_MAG_FS_12Ga:
-      *pfData = ( float )LIS3MDL_MAG_SENSITIVITY_FOR_FS_12G;
+      *pfData = LIS3MDL_MAG_SENSITIVITY_FOR_FS_12G;
       break;
     case LIS3MDL_MAG_FS_16Ga:
-      *pfData = ( float )LIS3MDL_MAG_SENSITIVITY_FOR_FS_16G;
+      *pfData = LIS3MDL_MAG_SENSITIVITY_FOR_FS_16G;
       break;
     default:
-      *pfData = -1.0f;
+      *pfData = -1;
       break;
   }
 
@@ -274,6 +274,66 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetAxesRaw(int16_t *pData)
   pData[0] = ( ( ( ( int16_t )regValue[1] ) << 8 ) + ( int16_t )regValue[0] );
   pData[1] = ( ( ( ( int16_t )regValue[3] ) << 8 ) + ( int16_t )regValue[2] );
   pData[2] = ( ( ( ( int16_t )regValue[5] ) << 8 ) + ( int16_t )regValue[4] );
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Read data from LIS3MDL Magnetometer
+ * @param  pData the pointer where the magnetometer data are stored
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetTemp(float *pData)
+{
+  int16_t pDataRaw[1];
+  int16_t sensitivity = 0;
+
+  /* Read raw data from LIS3MDL output register. */
+  if ( GetTempRaw( pDataRaw ) == LIS3MDL_STATUS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  /* Get LIS3MDL actual sensitivity. */
+  if ( GetTempSensitivity( &sensitivity ) == LIS3MDL_STATUS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  /* Calculate the data. */
+  pData[0] = ( ( (float) pDataRaw[0] ) / sensitivity );
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Read Magnetometer Sensitivity
+ * @param  pfData the pointer where the magnetometer sensitivity is stored
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetTempSensitivity(int16_t *pfData)
+{
+  pfData[0] = LIS3MDL_TEMP_SENSITIVITY;
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Read raw data from LIS3MDL Magnetometer
+ * @param  pData the pointer where the magnetomer raw data are stored
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetTempRaw(int16_t *pData)
+{
+  uint8_t regValue[2] = {0, 0};
+
+  /* Read output registers from LIS3MDL_MAG_OUTX_L to LIS3MDL_MAG_OUTZ_H. */
+  if ( LIS3MDL_MAG_Get_Temperature( (void *)this, ( uint8_t* )regValue ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  /* Format the data. */
+  pData[0] = ( ( ( ( int16_t )regValue[1] ) << 8 ) + ( int16_t )regValue[0] );
 
   return LIS3MDL_STATUS_OK;
 }
@@ -464,6 +524,111 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::SetFS(float fullScale)
          :                          LIS3MDL_MAG_FS_16Ga;
 
   if ( LIS3MDL_MAG_W_FullScale( (void *)this, new_fs ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Read LIS3MDL Magnetometer mode for XY
+ * @param  mode the pointer to the output mode
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetModeXY(LIS3MDL_MAG_OM_t *mode)
+{
+  if ( LIS3MDL_MAG_R_OperatingModeXY( (void *)this, mode ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Set mode for XY
+ * @param  mode the mode for XY to be set
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::SetModeXY(LIS3MDL_MAG_OM_t mode)
+{
+  if ( LIS3MDL_MAG_W_OperatingModeXY( (void *)this, mode ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Read LIS3MDL Magnetometer mode for Z
+ * @param  mode the pointer to the output mode
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetModeZ(LIS3MDL_MAG_OMZ_t *mode)
+{
+  if ( LIS3MDL_MAG_R_OperatingModeZ( (void *)this, mode ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Set mode for Z
+ * @param  mode the mode for Z to be set
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::SetModeZ(LIS3MDL_MAG_OMZ_t mode)
+{
+  if ( LIS3MDL_MAG_W_OperatingModeZ( (void *)this, mode ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Read LIS3MDL Magnetometer Fast ODR mode
+ * @param  mode the pointer to the output mode
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::GetFastODR(LIS3MDL_MAG_FODR_t *mode)
+{
+  if ( LIS3MDL_MAG_R_FastODR( (void *)this, mode ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Set mode for Z
+ * @param  mode the mode for Z to be set
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::SetFastODR(LIS3MDL_MAG_FODR_t mode)
+{
+  if ( LIS3MDL_MAG_W_FastODR( (void *)this, mode ) == MEMS_ERROR )
+  {
+    return LIS3MDL_STATUS_ERROR;
+  }
+
+  return LIS3MDL_STATUS_OK;
+}
+
+/**
+ * @brief  Set Self Test
+ * @param  mode the mode to be set
+ * @retval LIS3MDL_STATUS_OK in case of success, an error code otherwise
+ */
+LIS3MDLStatusTypeDef LIS3MDLSensor::SelfTest(LIS3MDL_MAG_ST_t mode)
+{
+  if ( LIS3MDL_MAG_W_SelfTest( (void *)this, mode ) == MEMS_ERROR )
   {
     return LIS3MDL_STATUS_ERROR;
   }
