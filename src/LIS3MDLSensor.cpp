@@ -285,7 +285,7 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::GetAxesRaw(int16_t *pData)
  */
 LIS3MDLStatusTypeDef LIS3MDLSensor::GetODRRaw(LIS3MDL_MAG_DO_t* odr)
 {
-  if ( LIS3MDL_MAG_R_OutputDataRate( (void *)this, &odr ) == MEMS_ERROR )
+  if ( LIS3MDL_MAG_R_OutputDataRate( (void *)this, odr ) == MEMS_ERROR )
   {
     return LIS3MDL_STATUS_ERROR;
   }
@@ -389,9 +389,8 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::SetODR(float odr)
  */
 LIS3MDLStatusTypeDef LIS3MDLSensor::GetFSRaw(LIS3MDL_MAG_FS_t *fullScale)
 {
-  LIS3MDL_MAG_FS_t fs_low_level;
 
-  if ( LIS3MDL_MAG_R_FullScale( (void *)this, &fullScale ) == MEMS_ERROR )
+  if ( LIS3MDL_MAG_R_FullScale( (void *)this, fullScale ) == MEMS_ERROR )
   {
     return LIS3MDL_STATUS_ERROR;
   }
@@ -471,7 +470,6 @@ LIS3MDLStatusTypeDef LIS3MDLSensor::SetFS(float fullScale)
 
   return LIS3MDL_STATUS_OK;
 }
-
 
 /**
  * @brief Read magnetometer data from register
